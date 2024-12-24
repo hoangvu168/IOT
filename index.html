@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dữ Liệu Nhiệt Độ và Độ Ẩm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h3 {
+            text-align: center;
+            color: #333;
+        }
+        .data-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .data-table th {
+            background-color: #f2f2f2;
+        }
+        .data-table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .data-box {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dữ Liệu Nhiệt Độ và Độ Ẩm</h1>
+
+    <!-- Bảng Hiển Thị Dữ Liệu Hiện Tại -->
+    <div class="data-box">
+        <h3>Dữ Liệu Hiện Tại</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Nhiệt Độ</th>
+                    <th>Độ Ẩm</th>
+                    <th>Nhiệt Độ Tối Ưu (T_cap_nhat)</th>
+                    <th>Thời Gian</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td id="temperature">Đang tải...</td>
+                    <td id="humidity">Đang tải...</td>
+                    <td id="optimized_temperature">Đang tải...</td>
+                    <td id="timestamp">Đang tải...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Bảng Lịch Sử -->
+    <h3>5 Nhiệt Độ Tối Ưu Gần Nhất</h3>
+    <table class="data-table" id="history-table">
+        <thead>
+            <tr>
+                <th>Nhiệt Độ</th>
+                <th>Thời Gian</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Các hàng lịch sử sẽ được thêm vào ở đây -->
+        </tbody>
+    </table>
+
+    <script>
+        function fetchData() {
+            fetch('/get_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('temperature').textContent = data.temperature + " °C";
+                    document.getElementById('humidity').textContent = data.humidity + " %";
+                    document.getElementById('optimized_temperature').textContent = data.optimized_temperature + " °C";
+                    document.getElementById('timestamp').textContent = data.timestamp;
+                });
+
+            fetch('/get_history')
+                .then(response => response.json())
+                .then(data => {
+const tbody = document.querySelector('#history-table tbody');
+                    tbody.innerHTML = ''; // Xóa các hàng cũ
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `<td>${row.temperature} °C</td><td>${row.timestamp}</td>`;
+                        tbody.appendChild(tr);
+                    });
+                });
+        }
+
+        // Lấy dữ liệu mỗi 5 giây
+        setInterval(fetchData, 5000);
+
+        // Lấy dữ liệu ban đầu
+        fetchData();
+    </script>
+</body>
+</html>
